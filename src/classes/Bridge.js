@@ -7,16 +7,11 @@ export default class Bridge {
 	 * Creates a Bridge based on the given data.
 	 * @param {HueBridgeConfigurationRead} bridgeData
 	 *
-	 * @todo Delay finding the bridge until it's needed
 	 */
 	constructor( bridgeData ) {
 		this.id = bridgeData.id;
 		this.ipAddress = bridgeData.internalipaddress;
 		this.username = bridgeData.username || '';
-
-		if ( ! this.ipAddress ) {
-			this.findBridge();
-		}
 	}
 
 	/**
