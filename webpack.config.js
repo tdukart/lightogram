@@ -9,8 +9,7 @@ module.exports = {
 		loaders: [
 			{
 				test: /\.js$/,
-				exclude: /node_modules/,
-				include: 'node_modules/hue-colors',
+				exclude: /node_modules\/(?!hue-colors)/,
 				loader: 'babel-loader',
 				query: {
 					presets: ['es2015']

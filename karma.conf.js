@@ -38,7 +38,8 @@ module.exports = function ( config ) {
 		},
 
 		files: [
-			'test/*.js'
+			'test/*.js',
+			'node_modules/es6-promise/dist/es6-promise.js' //for mocking Promises
 		],
 
 		preprocessors: {

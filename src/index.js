@@ -1,2 +1,7 @@
-export { Bridge } from './classes/Bridge';
-export { Light } from './classes/Light';
+import Bridge from './classes/Bridge';
+import Light from './classes/Light';
+
+export default {
+	Bridge: Bridge,
+	Light: Light
+}
