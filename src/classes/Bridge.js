@@ -26,7 +26,8 @@ export default class Bridge {
 	findBridge() {
 		return new Promise( ( resolve, reject ) => {
 			Bridge.discoverBridges().then( ( discoveredBridges ) => {
-				var matchingBridge = discoveredBridges.find( ( bridge ) => bridge.id === this.id );
+				var matchingBridges = discoveredBridges.filter( bridge => bridge.id === this.id );
+				var matchingBridge = matchingBridges[0];
 				if ( matchingBridge ) {
 					this.ipAddress = matchingBridge.internalipaddress;
 					resolve( this.ipAddress );
@@ -244,6 +245,10 @@ export default class Bridge {
 		} );
 	}
 
+	static get upnpEndpoint() {
+		return 'https://www.meethue.com/api/nupnp';
+	}
+
 	/**
 	 * Discovers bridges on the local network using Hue's uPNP endpoint.
 	 * @returns {Promise.<Array<{HueBridgeConfigurationRead}>>} An array of Hue bridge _configurations_. It's up to you
@@ -251,7 +256,7 @@ export default class Bridge {
 	 */
 	static discoverBridges() {
 		return new Promise( ( resolve ) => {
-			Ajax.getJSON( 'https://www.meethue.com/api/nupnp', ( data ) => {
+			Ajax.getJSON( Bridge.upnpEndpoint, ( data ) => {
 				resolve( data );
 			} );
 		} );
