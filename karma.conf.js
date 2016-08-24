@@ -17,6 +17,9 @@ webpackConfig.module.postLoaders = [
 var path = require( 'path' );
 
 module.exports = function ( config ) {
+	var singleRun = false;
+
+
 	config.set( {
 		basePath: '',
 		frameworks: [

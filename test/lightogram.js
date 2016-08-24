@@ -5,7 +5,7 @@ var Ajax = AjaxClass.default;
 var Bridge = LightogramClass.default.Bridge;
 var Light = LightogramClass.default.Light;
 
-describe( 'Bridge discovery', () => {
+describe( 'Bridge', () => {
 
 	it( 'calls the Hue API to discover local bridges', ( done ) => {
 
@@ -28,18 +28,6 @@ describe( 'Bridge discovery', () => {
 
 	} );
 
-	it( 'looks for the bridge if it doesn\'t have an IP', () => {
-
-		spyOn( Bridge.prototype, 'findBridge' );
-
-		var myBridge = new Bridge( {
-			id: 'abc123'
-		} );
-
-		expect( Bridge.prototype.findBridge ).toHaveBeenCalled();
-
-	} );
-
 	it( 'parses through the discovered bridges to find the bridge', ( done ) => {
 		var myBridge;
 
@@ -57,7 +45,94 @@ describe( 'Bridge discovery', () => {
 		} );
 
 		myBridge = new Bridge( {id: 'soright'} );
+		myBridge.findBridge();
 
+	} );
+
+	it( 'fetches config', ( done ) => {
+		spyOn( Bridge.prototype, 'doApiCall' ).and.callFake( () => {
+			done();
+			return Promise.resolve( {config: 'my config'} );
+		} );
+
+		var myBridge = new Bridge( {
+			id: 'abc123'
+		} );
+
+		myBridge.getConfig().then( ( config ) => {
+			expect( config.config ).toEqual( 'my config' );
+		} );
+
+		expect( Bridge.prototype.doApiCall ).toHaveBeenCalledWith( 'GET', 'config' );
+	} );
+
+	it( 'caches config', ( done ) => {
+		spyOn( Bridge.prototype, 'doApiCall' ).and.callFake( () => {
+			done();
+			return Promise.resolve( {config: 'my config'} );
+		} );
+
+		var myBridge = new Bridge( {
+			id: 'abc123'
+		} );
+
+		myBridge.getConfig().then( () => {
+			myBridge.getConfig();
+		} );
+
+		expect( Bridge.prototype.doApiCall ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'sets an interval to wait for authorization', ( done ) => {
+		jasmine.clock().install();
+
+		var authorizationCount = 0;
+		spyOn( Bridge.prototype, 'authorize' ).and.callFake( () => {
+			authorizationCount ++;
+			if ( authorizationCount > 1 ) {
+				done();
+				expect( Bridge.prototype.authorize ).toHaveBeenCalledTimes( 2 );
+				return Promise.resolve( {success: {username: 'foo'}} );
+			} else {
+				return Promise.resolve( {error: {type: 101}} );
+			}
+		} );
+
+		var myBridge = new Bridge( {id: 'abc123'} );
+		myBridge.waitForAuthorization();
+
+		jasmine.clock().tick( 2200 );
+		jasmine.clock().uninstall();
+	} );
+
+	it( 'authorizes successfully', ( done ) => {
+		spyOn( Bridge.prototype, '_constructEndpointUrl' ).and.returnValue( 'http://www.example.com' );
+		spyOn( Ajax, 'postJSON' ).and.callFake( ( url, body, callback ) => {
+			done();
+			callback( [{success: {username: 'foo'}}] );
+		} );
+
+		var myBridge = new Bridge( {id: 'abc123'} );
+		var promise = myBridge.authorize();
+
+		expect( Ajax.postJSON ).toHaveBeenCalledWith( 'http://www.example.com', jasmine.any( Object ), jasmine.any( Function ) );
+		expect( promise ).toHaveBeenCalledWith( jasmine.objectContaining( {
+			username: 'foo'
+		} ) );
+	} );
+
+	it( 'gracefully handles authorization when the API returns a soft error', ( done ) => {
+		spyOn( Bridge.prototype, '_constructEndpointUrl' ).and.returnValue( 'http://www.example.com' );
+		spyOn( Ajax, 'postJSON' ).and.callFake( ( url, body, callback ) => {
+			done();
+			callback( [{error: {type: 101}}] );
+		} );
+
+		var myBridge = new Bridge( {id: 'abc123'} );
+		myBridge.authorize();
+
+		expect( Ajax.postJSON ).toHaveBeenCalledWith( 'http://www.example.com', jasmine.any( Object ), jasmine.any( Function ) );
+		expect( promise ).toHaveBeenCalledTimes( 0 );
 	} );
 
 } );
