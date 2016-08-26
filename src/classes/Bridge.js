@@ -6,15 +6,12 @@ export default class Bridge {
 	/**
 	 * Creates a Bridge based on the given data.
 	 * @param {HueBridgeConfigurationRead} bridgeData
+	 *
 	 */
 	constructor( bridgeData ) {
 		this.id = bridgeData.id;
 		this.ipAddress = bridgeData.internalipaddress;
 		this.username = bridgeData.username || '';
-
-		if ( ! this.ipAddress ) {
-			this.findBridge();
-		}
 	}
 
 	/**
@@ -24,8 +21,10 @@ export default class Bridge {
 	findBridge() {
 		return new Promise( ( resolve, reject ) => {
 			Bridge.discoverBridges().then( ( discoveredBridges ) => {
-				if ( discoveredBridges.hasOwnProperty( this.id ) ) {
-					this.ipAddress = discoveredBridges[this.id].ipAddress;
+				var matchingBridges = discoveredBridges.filter( bridge => bridge.id === this.id );
+				var matchingBridge = matchingBridges[0];
+				if ( matchingBridge ) {
+					this.ipAddress = matchingBridge.internalipaddress;
 					resolve( this.ipAddress );
 				} else {
 					reject();
@@ -241,20 +240,19 @@ export default class Bridge {
 		} );
 	}
 
+	static get upnpEndpoint() {
+		return 'https://www.meethue.com/api/nupnp';
+	}
+
 	/**
 	 * Discovers bridges on the local network using Hue's uPNP endpoint.
-	 * @returns {Promise.<Array<Bridge>>}
+	 * @returns {Promise.<Array<{HueBridgeConfigurationRead}>>} An array of Hue bridge _configurations_. It's up to you
+	 * to create the Bridge objects.
 	 */
 	static discoverBridges() {
 		return new Promise( ( resolve ) => {
-			Ajax.getJSON( 'https://www.meethue.com/api/nupnp', ( data ) => {
-				var bridges = {};
-
-				data.forEach( function ( bridgeData ) {
-					bridges[bridgeData.id] = new Bridge( bridgeData );
-				} );
-
-				resolve( bridges );
+			Ajax.getJSON( Bridge.upnpEndpoint, ( data ) => {
+				resolve( data );
 			} );
 		} );
 	}

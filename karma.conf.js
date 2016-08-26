@@ -17,6 +17,9 @@ webpackConfig.module.postLoaders = [
 var path = require( 'path' );
 
 module.exports = function ( config ) {
+	var singleRun = false;
+
+
 	config.set( {
 		basePath: '',
 		frameworks: [
@@ -38,7 +41,8 @@ module.exports = function ( config ) {
 		},
 
 		files: [
-			'test/*.js'
+			'test/*.js',
+			'node_modules/es6-promise/dist/es6-promise.js' //for mocking Promises
 		],
 
 		preprocessors: {
