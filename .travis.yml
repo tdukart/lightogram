@@ -1,3 +1,18 @@
 language: node_js
 node_js:
-  - '5'
+- '5'
+deploy:
+  - provider: releases
+    api_key:
+      secure: qKxVhTlL5J9oq+7h+UX6/V8pY/W38Ff2Stz7xs8jS3yQjpQSzkpYBuoKqE8T7AmsURtVj9PQ39HwF2U1LP/8PJQZymbkcKAQeMnfVxagto3Av9dF92CDZ1wCuPqg8Ek9AWvATLGPElT8BQZ4E4BdEPmxnPpEzPsSKzv6H0mDkSonH9Qlbb2B6kUPD5BpdCwoYA46E0na3pAKGr2eL8oLskGmv6zbWV1BvAARIhK74Gys6JrCt7MS5Ma/nLaEe/ZNd6n7QqUtiRMeuGP7YZjaPVyFl5Z5wSDXO2qmtR5FqTDmc0ZN5E7qQP7UMdBU5cdm69FcDhqGsWCRqVgliTpzFwrxt/hg8CoawRVyV/fRBnlHD4hwjDNoJRrXzO3Bgtnu2GxmLYu2s9N8WDldIDYBaScksHk2Ygy3fxDSsJVOLyr4ood8ireiF2tV4+3T6E5e3KYT8nSWzPyf4bDxP2zRRSDLtkd7cOgFv45NybtyDKx6PSznEccJ7kSEcNc/ke05Pj1cGOeZVk2MMvEvgg5KFCxPcxwuoP8aWhs/gKb1WxyvrJfas4R0mIbTVIvC+8KtZ5R/zfgsNO6RCGuIhjTD5/nWvlNG0MXEKaptGQlsR4Oaaw8C6G5AGI6yU8oUDT4zZ20dpddcU4aMUmedV/XHc9Sb99+je+K9P+MyjBUziic=
+    file: dist/lightogram.js
+    on:
+      repo: tdukart/lightogram
+      tags: true
+  - provider: npm
+    email: tdukart@aloftinteractive.com
+    api_key:
+      secure: Yrktz99xguzpmCIF4VG7SojOUrj2xGBng+zoW64uDf6D1kidiFTycSUckPdj/qYAKWLSQzAXbUznebUa2haD2LGoEc5KmSdWwKzFMMlZIpzPCSEbPDe6tt16fTCx18tiRwkgLC0pxerkEnZXalFqNWnYvT5xAgzjQFil06tO2ixRM+yziSz/UMWRcmBUCMioNeoGwHOoFhFW8K0ycrIrvDY0HhBXQCvg8qnevlrJZfALY/+UeMb5CjRCjKOwE0OXxASGQV/XBhmfVt8DhhkC4cHWRhwYql/bzQ9eZTe/nuZbK+dyGtFcvc84wB4Nn52rF4DL48efNjF7daJbuO64+1DcGKu6LgmBzZs3FUo+9ObUKFMW/MtST5J/zHaPVzN0wviUNpruZmA8CEv/ySCzVWPl2A3cayd76OkJIzSaCCxXW3w9lDLi0408gp3GTjaHtZqmDGYN01oRIsHnp3K750JdBPMzWGC1BXaJJcqXqVhT7uJI1m0Iq5Do17rztNHYen/VCyH3BYkDq30S6KrJjXYvXAVZwb6WH9L2Y81X6z/55g4h3NTmutrzz2yYp6RQEERzjckMZ6p8fnGCKGu2/551l2FukmSVL+ULQ/Izk4Oxya2sIquHSIl65pPCddUGKioDdVagHhvWBZ45yTOaduW66cD0qMJiaPByyvM8Tak=
+    on:
+      tags: true
+      repo: tdukart/lightogram
