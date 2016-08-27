@@ -1,5 +1,6 @@
 import * as LightogramClass from '../src/index';
 import * as AjaxClass from '../src/util/ajax';
+import HueColor from 'hue-colors';
 
 var Ajax = AjaxClass.default;
 var Bridge = LightogramClass.default.Bridge;
@@ -134,5 +135,97 @@ describe( 'Bridge', () => {
 		expect( Ajax.postJSON ).toHaveBeenCalledWith( 'http://www.example.com', jasmine.any( Object ), jasmine.any( Function ) );
 		expect( promise ).toHaveBeenCalledTimes( 0 );
 	} );
+
+} );
+
+describe( 'Light', () => {
+	var bridge,
+		myLight;
+
+	beforeEach( () => {
+		bridge = new Bridge( {id: 'test'} );
+		myLight = new Light( bridge, 'testlight', {type: 'test', name: 'test light'} );
+	} );
+
+	it( 'gets the light\'s state', ( done ) => {
+		spyOn( bridge, 'doApiCall' ).and.returnValue( Promise.resolve( {
+			name: 'test light',
+			state: {on: true}
+		} ) );
+
+		myLight.getState().then( ( state ) => {
+			expect( state.on ).toBe( true );
+			done();
+		} );
+
+		expect( bridge.doApiCall ).toHaveBeenCalledWith( 'GET', 'lights/testlight', undefined );
+	} );
+
+	it( 'sets the light\'s state', ( done ) => {
+		spyOn( bridge, 'doApiCall' ).and.returnValue( Promise.resolve() );
+
+		myLight.setState( {on: false}, 200 ).then( () => {
+			done();
+		} );
+
+		expect( bridge.doApiCall ).toHaveBeenCalledWith( 'PUT', 'lights/testlight/state', {
+			on: false,
+			transitionTime: 2
+		} );
+	} );
+
+	it( 'sets the light\'s on state', ( done ) => {
+		spyOn( bridge, 'doApiCall' ).and.returnValue( Promise.resolve() );
+
+		myLight.setOn( false, 500 ).then( () => {
+			done();
+		} );
+
+		expect( bridge.doApiCall ).toHaveBeenCalledWith( 'PUT', 'lights/testlight/state', {
+			on: false,
+			transitionTime: 5
+		} );
+	} );
+
+	it( 'sets the light\'s color by hex code', ( done ) => {
+		var myColor = new HueColor;
+
+		spyOn( bridge, 'doApiCall' ).and.returnValue( Promise.resolve() );
+		spyOn( HueColor, 'fromHex' ).and.returnValue( myColor );
+		spyOn( myColor, 'toCie' ).and.returnValue( [1, 2, 3] );
+
+		myLight.setColorHex( '001100', 500 ).then( () => {
+			done();
+		} );
+
+		expect( HueColor.fromHex ).toHaveBeenCalledWith( '001100' );
+
+		expect( bridge.doApiCall ).toHaveBeenCalledWith( 'PUT', 'lights/testlight/state', {
+			xy: [1, 2],
+			bri: 3,
+			transitionTime: 5
+		} );
+	} );
+
+	it( 'sets the light\'s color by RGB code', ( done ) => {
+		var myColor = new HueColor;
+
+		spyOn( bridge, 'doApiCall' ).and.returnValue( Promise.resolve() );
+		spyOn( HueColor, 'fromRgb' ).and.returnValue( myColor );
+		spyOn( myColor, 'toCie' ).and.returnValue( [1, 2, 3] );
+
+		myLight.setColorRgb( 21, 22, 23, 500 ).then( () => {
+			done();
+		} );
+
+		expect( HueColor.fromRgb ).toHaveBeenCalledWith( 21, 22, 23 );
+
+		expect( bridge.doApiCall ).toHaveBeenCalledWith( 'PUT', 'lights/testlight/state', {
+			xy: [1, 2],
+			bri: 3,
+			transitionTime: 5
+		} );
+	} );
+
 
 } );

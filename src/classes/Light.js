@@ -20,6 +20,8 @@ export default class Light {
 	 * @param {string} action     An HTTP action.
 	 * @param {string} [endpoint] The light-specific endpoint. (Comes after lights/{lightId})
 	 * @param {Object} [data]     The data to send in the request body.
+	 *
+	 * @returns {Promise<*>}
 	 */
 	doApiCall( action, endpoint, data ) {
 		var bridgeEndpoint = `lights/${this.lightId}`;
@@ -27,7 +29,7 @@ export default class Light {
 			bridgeEndpoint += `/${endpoint}`;
 		}
 
-		this.bridge.doApiCall( action, bridgeEndpoint, data );
+		return this.bridge.doApiCall( action, bridgeEndpoint, data );
 	}
 
 	/**
@@ -35,12 +37,12 @@ export default class Light {
 	 * @returns {Promise<HueLightStateRead>}
 	 */
 	getState() {
-		return new Promise( function ( resolve, reject ) {
-			this.doApiCall( 'GET' ).then( function ( lightData ) {
+		return new Promise( ( resolve, reject ) => {
+			this.doApiCall( 'GET' ).then( ( lightData ) => {
 				this.name = lightData.name; // The name of the light is editable, so while we're here, refresh the data.
 				resolve( lightData.state );
-			}.bind( this ) );
-		}.bind( this ) );
+			} );
+		} );
 	}
 
 	/**
