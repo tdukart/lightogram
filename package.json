@@ -4,6 +4,7 @@
   "description": "JavaScript API for Hue lights",
   "main": "src/index.js",
   "scripts": {
+    "prepublish": "grunt dist",
     "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS"
   },
   "repository": {
