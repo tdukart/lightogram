@@ -43,7 +43,7 @@ export default class Bridge {
 	 */
 	doApiCall( action, endpoint, data ) {
 		return new Promise( ( resolve, reject ) => {
-			this.getIpAddress().then( function () {
+			this.getIpAddress().then( () => {
 				var endpointUrl = this._constructEndpointUrl( endpoint );
 				Ajax.performJSON( action, endpointUrl, data, ( result ) => {
 					var parsedResult;
@@ -128,7 +128,8 @@ export default class Bridge {
 	 */
 	getName() {
 		return new Promise( ( resolve, reject ) => {
-			this.getConfig().then( function ( config ) {
+			this.getConfig().then( ( config ) => {
+				this.name = config.name;
 				resolve( config.name );
 			}, reject );
 		} );
