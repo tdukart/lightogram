@@ -5,13 +5,18 @@ export default class Bridge {
 
 	/**
 	 * Creates a Bridge based on the given data.
-	 * @param {HueBridgeConfigurationRead} bridgeData
+	 * @param {HueBridgeConfigurationRead} bridgeData The bridge's data.
+	 * @param {string} appName                        The name of the app.
+	 * @param {string} deviceName                     A name of the device the app is run on.
 	 *
 	 */
-	constructor( bridgeData ) {
+	constructor( bridgeData, appName, deviceName ) {
 		this.id = bridgeData.id;
 		this.ipAddress = bridgeData.internalipaddress;
 		this.username = bridgeData.username || '';
+
+		this.appName = appName;
+		this.deviceName = deviceName
 	}
 
 	/**
@@ -223,9 +228,13 @@ export default class Bridge {
 	 * @returns {Promise} Resolves with the result of the single request.
 	 */
 	authorize() {
-		return new Promise( ( resolve ) => {
+		return new Promise( ( resolve, reject ) => {
+			if ( ! this.appName || ! this.deviceName ) {
+				reject( 'Invalid app or device name.' );
+				return;
+			}
 			var body = {
-				devicetype: 'lightboard#webapp'
+				devicetype: `${this.appName}#${this.deviceName}`
 			};
 			Ajax.postJSON( this._constructEndpointUrl( '' ), JSON.stringify( body ), ( data ) => {
 				var firstItem = data[0];

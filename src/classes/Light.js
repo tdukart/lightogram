@@ -134,6 +134,16 @@ export default class Light {
 	}
 
 	/**
+	 * Sets the brightness.
+	 * @param {number} brightness The new brightness, from 1 to 254.
+	 * @param {number} [time]     Transition time in milliseconds.
+	 * @returns {*}
+	 */
+	setBrightness( brightness, time ) {
+		return this.setState( {bri: parseInt( brightness )}, time );
+	}
+
+	/**
 	 * Gets the color of the light in RGB.
 	 * @returns {Promise.<{red:{number},green:{number},blue:{number}}>}
 	 */
