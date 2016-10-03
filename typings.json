@@ -1,0 +1,8 @@
+{
+  "name": "lightogram",
+  "main": "lightogram.d.ts",
+  "dependencies": {},
+  "globalDependencies": {
+    "hue-colors": "github:tdukart/hue-colors"
+  }
+}

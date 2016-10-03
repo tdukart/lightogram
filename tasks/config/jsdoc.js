@@ -6,13 +6,6 @@ module.exports = function ( grunt ) {
 			options: {
 				destination: 'docs'
 			}
-		},
-		typescript: {
-			src: ['src/*.js', 'src/**/*.js', 'node_modules/hue-colors/dist/hue-colors.js'],
-			options: {
-				destination: 'docs',
-				template: 'node_modules/tsd-jsdoc'
-			}
 		}
 	} );
 
