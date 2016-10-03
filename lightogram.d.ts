@@ -61,7 +61,7 @@ interface LightogramBridge {
     getUsername(): Promise<string>;
     getConfig(forceRefresh?: boolean): Promise;
     getName(): Promise;
-    light(lightId: any): Light;
+    light(lightId: any): LightogramLight;
     setLightState(lightId: any, state: any): any;
     removeAuthorization(username: any): Promise;
     waitForAuthorization(): Promise;
@@ -75,7 +75,7 @@ interface LightogramBridgeStatic {
 
 
 interface LightogramLight {
-    constructor(bridge: Bridge, lightId: string, lightData: Object);
+    constructor(bridge: LightogramBridge, lightId: string, lightData: Object);
     doApiCall(action: string, endpoint?: string, data?: Object): Promise<any>;
     getState(): Promise<HueLightStateRead>;
     setState(state: HueLightStateSet, time?: number): any;
@@ -91,7 +91,7 @@ interface LightogramLight {
 }
 
 interface LightogramLightStatic {
-    new(bridge: Bridge, lightId: string, lightData: Object): LightogramLight
+    new(bridge: LightogramBridge, lightId: string, lightData: Object): LightogramLight
 }
 
 declare module "lightogram" {
