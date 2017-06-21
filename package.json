@@ -4,7 +4,7 @@
   "description": "JavaScript API for Hue lights",
   "main": "dist/lightogram.js",
   "scripts": {
-    "prepublish": "./node_modules/.bin/grunt dist",
+    "prepare": "./node_modules/.bin/grunt dist",
     "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS"
   },
   "repository": {
