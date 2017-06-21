@@ -18,7 +18,10 @@ export default class Ajax {
 		let xhr = new XMLHttpRequest();
 		xhr.onload = function () {
 			var result = JSON.parse( this.responseText );
-			callback( result );
+			callback(null, result );
+		};
+		xhr.onerror = function(error) {
+			callback(error);
 		};
 		xhr.open( action, url, true );
 		xhr.send( body );
