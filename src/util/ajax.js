@@ -12,13 +12,16 @@ export default class Ajax {
 	}
 
 	static performJSON( action, url, body, callback ) {
-		if ( 'string' !== typeof body ) {
+		if ( null !== body && 'string' !== typeof body ) {
 			body = JSON.stringify( body );
 		}
 		let xhr = new XMLHttpRequest();
 		xhr.onload = function () {
 			var result = JSON.parse( this.responseText );
-			callback( result );
+			callback( null, result );
+		};
+		xhr.onerror = function ( error ) {
+			callback( error );
 		};
 		xhr.open( action, url, true );
 		xhr.send( body );

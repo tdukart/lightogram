@@ -27,7 +27,7 @@ export default class Bridge {
 		return new Promise( ( resolve, reject ) => {
 			Bridge.discoverBridges().then( ( discoveredBridges ) => {
 				var matchingBridges = discoveredBridges.filter( bridge => bridge.id === this.id );
-				var matchingBridge = matchingBridges[0];
+				var matchingBridge = matchingBridges[ 0 ];
 				if ( matchingBridge ) {
 					this.ipAddress = matchingBridge.internalipaddress;
 					resolve( this.ipAddress );
@@ -50,17 +50,21 @@ export default class Bridge {
 		return new Promise( ( resolve, reject ) => {
 			this.getIpAddress().then( () => {
 				var endpointUrl = this._constructEndpointUrl( endpoint );
-				Ajax.performJSON( action, endpointUrl, data, ( result ) => {
-					var parsedResult;
-					if ( Array.isArray( result ) ) {
-						parsedResult = result[0];
+				Ajax.performJSON( action, endpointUrl, data, ( xhrError, result ) => {
+					if ( xhrError ) {
+						reject( xhrError );
 					} else {
-						parsedResult = result;
-					}
-					if ( undefined === parsedResult || parsedResult.hasOwnProperty( 'error' ) ) {
-						reject( parsedResult );
-					} else {
-						resolve( parsedResult );
+						var parsedResult;
+						if ( Array.isArray( result ) ) {
+							parsedResult = result[ 0 ];
+						} else {
+							parsedResult = result;
+						}
+						if ( undefined === parsedResult || parsedResult.hasOwnProperty( 'error' ) ) {
+							reject( parsedResult );
+						} else {
+							resolve( parsedResult );
+						}
 					}
 				} );
 			} );
@@ -74,7 +78,7 @@ export default class Bridge {
 	 * @returns {string} The full URL.
 	 */
 	_constructEndpointUrl( endpoint ) {
-		var pathComponents = ['api', this.username, endpoint];
+		var pathComponents = [ 'api', this.username, endpoint ];
 		var path = pathComponents.filter( n => '' !== n ).join( '/' );
 
 		return `http://${this.ipAddress}/${path}`;
@@ -116,7 +120,7 @@ export default class Bridge {
 	 */
 	getConfig( forceRefresh ) {
 		return new Promise( ( resolve ) => {
-			if ( ! forceRefresh && this.config ) {
+			if ( !forceRefresh && this.config ) {
 				resolve( this.config );
 			} else {
 				this.doApiCall( 'GET', 'config' ).then( ( config ) => {
@@ -147,7 +151,7 @@ export default class Bridge {
 			} else {
 				this.doApiCall( 'GET', 'lights' ).then( ( lights ) => {
 					this.lights = Object.keys( lights ).map( ( lightId ) => {
-						var lightData = lights[lightId];
+						var lightData = lights[ lightId ];
 						return new Light( this, lightId, lightData );
 					} );
 					resolve( this.lights );
@@ -189,8 +193,12 @@ export default class Bridge {
 	 */
 	removeAuthorization( username ) {
 		return new Promise( ( resolve, reject ) => {
-			Ajax.deleteJSON( this._constructEndpointUrl( `config/whitelist/${username}` ), ( result ) => {
-				resolve( result );
+			Ajax.deleteJSON( this._constructEndpointUrl( `config/whitelist/${username}` ), ( xhrError, result ) => {
+				if ( xhrError ) {
+					reject( xhrError );
+				} else {
+					resolve( result );
+				}
 			} );
 		} );
 	}
@@ -207,7 +215,7 @@ export default class Bridge {
 				var count = 0;
 
 				var authorizationInterval = setInterval( () => {
-					count ++;
+					count++;
 					if ( count > 60 ) {
 						clearInterval( authorizationInterval );
 						reject();
@@ -229,23 +237,27 @@ export default class Bridge {
 	 */
 	authorize() {
 		return new Promise( ( resolve, reject ) => {
-			if ( ! this.appName || ! this.deviceName ) {
+			if ( !this.appName || !this.deviceName ) {
 				reject( 'Invalid app or device name.' );
 				return;
 			}
 			var body = {
 				devicetype: `${this.appName}#${this.deviceName}`
 			};
-			Ajax.postJSON( this._constructEndpointUrl( '' ), JSON.stringify( body ), ( data ) => {
-				var firstItem = data[0];
-				if ( firstItem.error ) {
-					if ( 101 !== firstItem.error.type ) {
-						throw new Error( 'Authorization error: ' + firstItem.error );
+			Ajax.postJSON( this._constructEndpointUrl( '' ), JSON.stringify( body ), ( xhrError, data ) => {
+				if ( xhrError ) {
+					reject( xhrError )
+				} else {
+					var firstItem = data[ 0 ];
+					if ( firstItem.error ) {
+						if ( 101 !== firstItem.error.type ) {
+							throw new Error( 'Authorization error: ' + firstItem.error );
+						}
+					} else if ( firstItem.success ) {
+						this.username = firstItem.success.username;
 					}
-				} else if ( firstItem.success ) {
-					this.username = firstItem.success.username;
+					resolve( firstItem );
 				}
-				resolve( firstItem );
 			} );
 		} );
 	}
@@ -260,9 +272,13 @@ export default class Bridge {
 	 * to create the Bridge objects.
 	 */
 	static discoverBridges() {
-		return new Promise( ( resolve ) => {
-			Ajax.getJSON( Bridge.upnpEndpoint, ( data ) => {
-				resolve( data );
+		return new Promise( ( resolve, reject ) => {
+			Ajax.getJSON( Bridge.upnpEndpoint, ( error, data ) => {
+				if ( error ) {
+					reject( error );
+				} else {
+					resolve( data );
+				}
 			} );
 		} );
 	}

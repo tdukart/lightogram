@@ -11,23 +11,26 @@ describe( 'Bridge', () => {
 	var myBridge;
 
 	beforeEach( () => {
-		myBridge = new Bridge( {id: 'test'}, 'testapp', 'test' );
+		myBridge = new Bridge( { id: 'test' }, 'testapp', 'test' );
 	} );
 
 	it( 'calls the Hue API to discover local bridges', ( done ) => {
 
 		spyOn( Ajax, 'getJSON' ).and.callFake( ( url, callback ) => {
-			callback( [
-				{
-					id: 'abc123',
-					internalipaddress: 'fake.ip.address'
-				}
-			] );
+			callback(
+				null,
+				[
+					{
+						id: 'abc123',
+						internalipaddress: 'fake.ip.address'
+					}
+				]
+			);
 		} );
 
 		var promise = Bridge.discoverBridges();
 		promise.then( ( bridges ) => {
-			expect( 'abc123' === bridges[0].id );
+			expect( 'abc123' === bridges[ 0 ].id );
 			done();
 		} );
 
@@ -46,12 +49,12 @@ describe( 'Bridge', () => {
 			}, 1 );
 
 			return Promise.resolve( [
-				{id: 'soright', internalipaddress: 'pandas.in.pajamas'},
-				{id: 'verywrong', internalipaddress: 'pandas.in.suits'}
+				{ id: 'soright', internalipaddress: 'pandas.in.pajamas' },
+				{ id: 'verywrong', internalipaddress: 'pandas.in.suits' }
 			] );
 		} );
 
-		testBridge = new Bridge( {id: 'soright'}, 'testapp', 'test' );
+		testBridge = new Bridge( { id: 'soright' }, 'testapp', 'test' );
 		testBridge.findBridge();
 
 	} );
@@ -59,7 +62,7 @@ describe( 'Bridge', () => {
 	it( 'requires an app name and device name', ( done ) => {
 		var testBridge;
 
-		testBridge = new Bridge( {id: 'missing'} );
+		testBridge = new Bridge( { id: 'missing' } );
 
 		var promise = testBridge.authorize();
 
@@ -74,7 +77,7 @@ describe( 'Bridge', () => {
 	it( 'fetches config', ( done ) => {
 		spyOn( Bridge.prototype, 'doApiCall' ).and.callFake( () => {
 			done();
-			return Promise.resolve( {config: 'my config'} );
+			return Promise.resolve( { config: 'my config' } );
 		} );
 
 		myBridge.getConfig().then( ( config ) => {
@@ -87,7 +90,7 @@ describe( 'Bridge', () => {
 	it( 'caches config', ( done ) => {
 		spyOn( Bridge.prototype, 'doApiCall' ).and.callFake( () => {
 			done();
-			return Promise.resolve( {config: 'my config'} );
+			return Promise.resolve( { config: 'my config' } );
 		} );
 
 		myBridge.getConfig().then( () => {
@@ -102,13 +105,13 @@ describe( 'Bridge', () => {
 
 		var authorizationCount = 0;
 		spyOn( Bridge.prototype, 'authorize' ).and.callFake( () => {
-			authorizationCount ++;
+			authorizationCount++;
 			if ( authorizationCount > 1 ) {
 				done();
 				expect( Bridge.prototype.authorize ).toHaveBeenCalledTimes( 2 );
-				return Promise.resolve( {success: {username: 'foo'}} );
+				return Promise.resolve( { success: { username: 'foo' } } );
 			} else {
-				return Promise.resolve( {error: {type: 101}} );
+				return Promise.resolve( { error: { type: 101 } } );
 			}
 		} );
 
@@ -123,7 +126,7 @@ describe( 'Bridge', () => {
 		spyOn( Bridge.prototype, '_constructEndpointUrl' ).and.returnValue( 'http://www.example.com' );
 		spyOn( Ajax, 'postJSON' ).and.callFake( ( url, body, callback ) => {
 			done();
-			callback( [{success: {username: 'foo'}}] );
+			callback( null, [ { success: { username: 'foo' } } ] );
 		} );
 
 		var promise = myBridge.authorize();
@@ -139,7 +142,7 @@ describe( 'Bridge', () => {
 		spyOn( Bridge.prototype, '_constructEndpointUrl' ).and.returnValue( 'http://www.example.com' );
 		spyOn( Ajax, 'postJSON' ).and.callFake( ( url, body, callback ) => {
 			done();
-			callback( [{error: {type: 101}}] );
+			callback( null, [ { error: { type: 101 } } ] );
 		} );
 
 		var promise = myBridge.authorize();
@@ -155,14 +158,14 @@ describe( 'Light', () => {
 		myLight;
 
 	beforeEach( () => {
-		myBridge = new Bridge( {id: 'test'}, 'testapp', 'test' );
-		myLight = new Light( myBridge, 'testlight', {type: 'test', name: 'test light'} );
+		myBridge = new Bridge( { id: 'test' }, 'testapp', 'test' );
+		myLight = new Light( myBridge, 'testlight', { type: 'test', name: 'test light' } );
 	} );
 
 	it( 'gets the light\'s state', ( done ) => {
 		spyOn( myBridge, 'doApiCall' ).and.returnValue( Promise.resolve( {
 			name: 'test light',
-			state: {on: true}
+			state: { on: true }
 		} ) );
 
 		myLight.getState().then( ( state ) => {
@@ -176,7 +179,7 @@ describe( 'Light', () => {
 	it( 'sets the light\'s state', ( done ) => {
 		spyOn( myBridge, 'doApiCall' ).and.returnValue( Promise.resolve() );
 
-		myLight.setState( {on: false}, 200 ).then( () => {
+		myLight.setState( { on: false }, 200 ).then( () => {
 			done();
 		} );
 
@@ -204,7 +207,7 @@ describe( 'Light', () => {
 
 		spyOn( myBridge, 'doApiCall' ).and.returnValue( Promise.resolve() );
 		spyOn( HueColor, 'fromHex' ).and.returnValue( myColor );
-		spyOn( myColor, 'toCie' ).and.returnValue( [1, 2, 3] );
+		spyOn( myColor, 'toCie' ).and.returnValue( [ 1, 2, 3 ] );
 
 		myLight.setColorHex( '001100', 500 ).then( () => {
 			done();
@@ -213,7 +216,7 @@ describe( 'Light', () => {
 		expect( HueColor.fromHex ).toHaveBeenCalledWith( '001100' );
 
 		expect( myBridge.doApiCall ).toHaveBeenCalledWith( 'PUT', 'lights/testlight/state', {
-			xy: [1, 2],
+			xy: [ 1, 2 ],
 			bri: 3,
 			transitionTime: 5
 		} );
@@ -224,7 +227,7 @@ describe( 'Light', () => {
 
 		spyOn( myBridge, 'doApiCall' ).and.returnValue( Promise.resolve() );
 		spyOn( HueColor, 'fromRgb' ).and.returnValue( myColor );
-		spyOn( myColor, 'toCie' ).and.returnValue( [1, 2, 3] );
+		spyOn( myColor, 'toCie' ).and.returnValue( [ 1, 2, 3 ] );
 
 		myLight.setColorRgb( 21, 22, 23, 500 ).then( () => {
 			done();
@@ -233,7 +236,7 @@ describe( 'Light', () => {
 		expect( HueColor.fromRgb ).toHaveBeenCalledWith( 21, 22, 23 );
 
 		expect( myBridge.doApiCall ).toHaveBeenCalledWith( 'PUT', 'lights/testlight/state', {
-			xy: [1, 2],
+			xy: [ 1, 2 ],
 			bri: 3,
 			transitionTime: 5
 		} );
